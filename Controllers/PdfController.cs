@@ -1,5 +1,12 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
+using System;
+using System.Web;
+using System.IO;
+using System.Text;
+using pdfsvc.Business;
 
 namespace pdfsvc.Controllers
 {
@@ -11,22 +18,73 @@ namespace pdfsvc.Controllers
     public class PdfController : ControllerBase
     {
         private readonly ILogger<PdfController> _logger;
+        private readonly FileManager _fileManager;
 
-        public PdfController(ILogger<PdfController> logger)
+        public PdfController(ILogger<PdfController> logger, FileManager fileManager)
         {
             _logger = logger;
+            _fileManager = fileManager;
         }
 
         /// <summary>
-        /// 根据ID获取PDF文件
+        /// Office格式(word、excel、ppt)文件转PDF
         /// </summary>
-        /// <param name="id">PDF文件ID</param>
+        /// <param name="file">PDF文件</param>
+        /// <param name="sign">是否签名</param>
+        /// <param name="flag">签名标记</param>
         /// <returns>PDF文件</returns>
-        [HttpGet("{id}")]
-        public string Get(string id)
+        [HttpPost("convert")]
+        public async Task<IActionResult> Convert(IFormFile file, bool sign = false, string flag = null)
         {
-            _logger.LogInformation("get /pdf/{id}", id);
-            return "Hello World";
+            // 文件名
+            string fileName = Path.GetFileName(file.FileName);
+
+            // 上传Office文件保持路径
+            string inputFilePath = _fileManager.GetInputDocPath(fileName);
+
+            using (var stream = new FileStream(inputFilePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            // 输出PDF文件保存路径
+            string outputFilePath;
+            try
+            {
+                // PDF转换
+                outputFilePath = _fileManager.Convert(inputFilePath);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "转换PDF出错");
+                return Problem(e.StackTrace, e.Message, StatusCodes.Status500InternalServerError);
+            }
+
+            fileName = Path.GetFileName(outputFilePath);
+            // 文件名UTF-8编码
+            fileName = HttpUtility.UrlEncode(fileName, Encoding.UTF8);
+
+            return PhysicalFile(outputFilePath, "application/pdf", fileName);
+        }
+
+        /// <summary>
+        /// PDF文件签名盖章
+        /// </summary>
+        /// <param name="file">PDF文件</param>
+        /// <param name="flag">签名标记</param>
+        /// <returns>PDF文件</returns>
+        [HttpPost("sign")]
+        public IActionResult Sign(IFormFile file, string flag = null)
+        {
+            _logger.LogInformation("PDF文件签名盖章");
+
+            // 文件名
+            string fileName = Path.GetFileName(file.FileName);
+            // TODO PDF签名
+
+            // 文件名UTF-8编码
+            fileName = HttpUtility.UrlEncode(fileName, Encoding.UTF8);
+            return Ok();
         }
     }
 }

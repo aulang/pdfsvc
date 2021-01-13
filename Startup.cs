@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using pdfsvc.Business;
 
 namespace pdfsvc
 {
@@ -22,6 +23,7 @@ namespace pdfsvc
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton(new FileManager("D:/pdfsvc/data"));
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
