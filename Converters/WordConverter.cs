@@ -6,15 +6,12 @@ namespace pdfsvc.Converters
 {
     public class WordConverter : Converter
     {
-        private static Word.Application _app;
+        private Word.Application _app;
 
         public WordConverter()
         {
-            if (_app == null)
-            {
-                _app = new Word.Application();
-                _app.Visible = false;
-            }
+            _app = new Word.Application();
+            _app.Visible = false;
         }
 
         public override void Convert(string inputFile, string outputFile)
@@ -52,6 +49,19 @@ namespace pdfsvc.Converters
             catch
             {
                 // TODO 关闭文档失败
+            }
+        }
+
+        ~WordConverter()
+        {
+            try
+            {
+                _app.Quit(false);
+                ReleaseCOMObject(_app);
+            }
+            catch
+            {
+                // TODO 退出Wold程序失败
             }
         }
     }

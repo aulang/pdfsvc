@@ -42,7 +42,7 @@ namespace pdfsvc.Controllers
             // 上传Office文件保持路径
             string inputFilePath = _fileManager.GetInputDocPath(fileName);
 
-            using (var stream = new FileStream(inputFilePath, FileMode.Create))
+            using (FileStream stream = new FileStream(inputFilePath, FileMode.Create))
             {
                 await file.CopyToAsync(stream);
             }
@@ -60,7 +60,8 @@ namespace pdfsvc.Controllers
                 return Problem(e.StackTrace, e.Message, StatusCodes.Status500InternalServerError);
             }
 
-            fileName = Path.GetFileName(outputFilePath);
+            // 更改文件后缀
+            fileName = Path.ChangeExtension(fileName, FileManager.PDF);
             // 文件名UTF-8编码
             fileName = HttpUtility.UrlEncode(fileName, Encoding.UTF8);
 

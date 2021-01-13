@@ -6,7 +6,7 @@ namespace pdfsvc.Converters
 {
     public class ExcelConverter : Converter
     {
-        private static Excel.Application _app;
+        private Excel.Application _app;
 
         public ExcelConverter()
         {
@@ -52,6 +52,19 @@ namespace pdfsvc.Converters
             catch
             {
                 // TODO 关闭文档失败
+            }
+        }
+
+        ~ExcelConverter()
+        {
+            try
+            {
+                _app.Quit();
+                ReleaseCOMObject(_app);
+            }
+            catch
+            {
+                // TODO 退出Wold程序失败
             }
         }
     }

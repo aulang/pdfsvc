@@ -3,61 +3,39 @@ using System.Collections.Generic;
 
 namespace pdfsvc.Converters
 {
-    enum DocumentType
-    {
-        DOC,
-        DOCX,
-        XLS,
-        XLSX,
-        PPT,
-        PPTX
-    }
-
     public class ConverterFactory
     {
-        private const string DOT = ".";
+        private static Converter wordConverter = new WordConverter();
+        private static Converter excelConverter = new ExcelConverter();
+        private static Converter powerPointConverter = new PowerPointConverter();
 
-        private static Dictionary<DocumentType, Converter> converters = new Dictionary<DocumentType, Converter>();
-
-        private static Converter NewInstance(DocumentType type)
+        private static Converter GetByType(String type)
         {
             switch (type)
             {
-                case DocumentType.DOC:
-                case DocumentType.DOCX:
-                    return new WordConverter();
-                case DocumentType.XLS:
-                case DocumentType.XLSX:
-                    return new ExcelConverter();
-                case DocumentType.PPT:
-                case DocumentType.PPTX:
-                    return new PowerPointConverter();
+                case "DOC":
+                case "DOCX":
+                    return wordConverter;
+                case "XLS":
+                case "XLSX":
+                    return excelConverter;
+                case "PPT":
+                case "PPTX":
+                    return powerPointConverter;
                 default:
-                    return null;
+                    throw new ConvertException("不支持的文件格式！");
             }
         }
+
         public static Converter GetConverter(string extension)
         {
-            if (extension.StartsWith(DOT))
+            string type = extension;
+            if (type.StartsWith("."))
             {
-                extension = extension.Remove(0, 1).ToUpper();
+                type = type.Remove(0, 1).ToUpper();
             }
 
-            DocumentType type = (DocumentType)Enum.Parse(typeof(DocumentType), extension);
-
-            if (converters.ContainsKey(type))
-            {
-                return converters[type];
-            }
-
-            Converter converter = NewInstance(type);
-            if (converter == null)
-            {
-                throw new ConvertException("不支持的文件格式！");
-            }
-
-            converters.Add(type, converter);
-            return converter;
+            return GetByType(type);
         }
     }
 }

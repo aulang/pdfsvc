@@ -8,14 +8,13 @@ namespace pdfsvc.Converters
 
     public class PowerPointConverter : Converter
     {
-        private static PowerPoint.Application _app;
+        private PowerPoint.Application _app;
 
         public PowerPointConverter()
         {
             if (_app == null)
             {
                 _app = new PowerPoint.Application();
-                _app.Visible = MsoTriState.msoFalse;
             }
         }
 
@@ -54,6 +53,19 @@ namespace pdfsvc.Converters
             catch
             {
                 // TODO 关闭文档失败
+            }
+        }
+
+        ~PowerPointConverter()
+        {
+            try
+            {
+                _app.Quit();
+                ReleaseCOMObject(_app);
+            }
+            catch
+            {
+                // TODO 退出Wold程序失败
             }
         }
     }
