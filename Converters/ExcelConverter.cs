@@ -7,11 +7,14 @@ namespace pdfsvc.Converters
     public class ExcelConverter : Converter
     {
         private Excel.Application _app = null;
+        private Excel.Workbooks _books = null;
 
         public ExcelConverter()
         {
             _app = new Excel.Application();
             _app.Visible = false;
+
+            _books = _app.Workbooks;
         }
 
         public override void Convert(string inputFile, string outputFile)
@@ -24,13 +27,13 @@ namespace pdfsvc.Converters
             try
             {
                 // 打开文档
-                Excel.Workbook book = _app.Workbooks.Open(inputFile);
+                Excel.Workbook book = _books.Open(inputFile);
 
                 // 转换文档
                 book.ExportAsFixedFormat(Excel.XlFixedFormatType.xlTypePDF, outputFile);
 
                 // 关闭文档
-                close(book);
+                Close(book);
             }
             catch (Exception e)
             {
@@ -39,7 +42,7 @@ namespace pdfsvc.Converters
             }
         }
 
-        private void close(Excel.Workbook book)
+        private void Close(Excel.Workbook book)
         {
             try
             {
@@ -65,8 +68,17 @@ namespace pdfsvc.Converters
                 return;
             }
 
+            Console.WriteLine("关闭Excel！");
+
             try
             {
+                if (_books != null)
+                {
+                    _books.Close();
+                    ReleaseCOMObject(_books);
+                    _books = null;
+                }
+
                 _app.Quit();
                 ReleaseCOMObject(_app);
                 _app = null;

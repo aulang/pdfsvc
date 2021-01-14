@@ -52,6 +52,7 @@ namespace pdfsvc.Converters
             DisposeConverter(wordConverter);
             DisposeConverter(excelConverter);
             DisposeConverter(powerPointConverter);
+            Console.WriteLine("程序退出，关闭Office");
         }
     }
 }

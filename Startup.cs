@@ -46,17 +46,17 @@ namespace pdfsvc
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-
-                app.UseSwagger();
-                app.UseSwaggerUI(c =>
-                {
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "pdfsvc v1");
-                    // http://localhost:<port>/swagger
-                    // 不需要/swagger前缀
-                    // http://localhost:<port>/
-                    c.RoutePrefix = string.Empty;
-                });
             }
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "pdfsvc v1");
+                // http://localhost:<port>/swagger
+                // 不需要/swagger前缀
+                // http://localhost:<port>/
+                c.RoutePrefix = string.Empty;
+            });
 
             app.UseRouting();
 

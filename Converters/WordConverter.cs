@@ -7,11 +7,14 @@ namespace pdfsvc.Converters
     public class WordConverter : Converter
     {
         private Word.Application _app = null;
+        private Word.Documents _docs = null;
 
         public WordConverter()
         {
             _app = new Word.Application();
             _app.Visible = false;
+
+            _docs = _app.Documents;
         }
 
         public override void Convert(string inputFile, string outputFile)
@@ -24,13 +27,13 @@ namespace pdfsvc.Converters
             try
             {
                 // 打开文档
-                Word.Document doc = _app.Documents.Open(inputFile);
+                Word.Document doc = _docs.Open(inputFile);
 
                 // 转换文档
                 doc.ExportAsFixedFormat(outputFile, Word.WdExportFormat.wdExportFormatPDF);
 
                 // 关闭文档
-                close(doc);
+                Close(doc);
             }
             catch (Exception e)
             {
@@ -39,7 +42,7 @@ namespace pdfsvc.Converters
             }
         }
 
-        private void close(Word.Document doc)
+        private void Close(Word.Document doc)
         {
             try
             {
@@ -65,8 +68,17 @@ namespace pdfsvc.Converters
                 return;
             }
 
+            Console.WriteLine("关闭Word！");
+
             try
             {
+                if (_docs != null)
+                {
+                    _docs.Close(false);
+                    ReleaseCOMObject(_docs);
+                    _docs = null;
+                }
+
                 _app.Quit(false);
                 ReleaseCOMObject(_app);
                 _app = null;

@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Microsoft.Office.Core;
 using PowerPoint = Microsoft.Office.Interop.PowerPoint;
 
 namespace pdfsvc.Converters
@@ -9,10 +8,13 @@ namespace pdfsvc.Converters
     public class PowerPointConverter : Converter
     {
         private PowerPoint.Application _app = null;
+        private PowerPoint.Presentations _ppts = null;
 
         public PowerPointConverter()
         {
             _app = new PowerPoint.Application();
+
+            _ppts = _app.Presentations;
         }
 
         public override void Convert(string inputFile, string outputFile)
@@ -25,13 +27,13 @@ namespace pdfsvc.Converters
             try
             {
                 // 打开文档
-                PowerPoint.Presentation ppt = _app.Presentations.Open(inputFile);
+                PowerPoint.Presentation ppt = _ppts.Open(inputFile, WithWindow: Microsoft.Office.Core.MsoTriState.msoFalse);
 
                 // 转换文档
                 ppt.ExportAsFixedFormat(outputFile, PowerPoint.PpFixedFormatType.ppFixedFormatTypePDF);
 
                 // 关闭文档
-                close(ppt);
+                Close(ppt);
             }
             catch (Exception e)
             {
@@ -40,7 +42,7 @@ namespace pdfsvc.Converters
             }
         }
 
-        private void close(PowerPoint.Presentation ppt)
+        private void Close(PowerPoint.Presentation ppt)
         {
             try
             {
@@ -66,8 +68,16 @@ namespace pdfsvc.Converters
                 return;
             }
 
+            Console.WriteLine("关闭PowerPoint！");
+
             try
             {
+                if (_ppts != null)
+                {
+                    ReleaseCOMObject(_ppts);
+                    _ppts = null;
+                }
+
                 _app.Quit();
                 ReleaseCOMObject(_app);
                 _app = null;
