@@ -1,10 +1,13 @@
+using System;
 using System.Runtime.InteropServices;
 
 namespace pdfsvc.Converters
 {
-    public abstract class Converter
+    public abstract class Converter : IDisposable
     {
         public abstract void Convert(string inputFile, string outputFile);
+
+        public abstract void Dispose();
 
         protected void ReleaseCOMObject(object obj)
         {
@@ -19,7 +22,6 @@ namespace pdfsvc.Converters
             {
                 // 无法处理异常
             }
-            obj = null;
         }
     }
 }

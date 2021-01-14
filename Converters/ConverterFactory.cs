@@ -1,13 +1,13 @@
 using System;
-using System.Collections.Generic;
 
 namespace pdfsvc.Converters
 {
+
     public class ConverterFactory
     {
-        private static Converter wordConverter = new WordConverter();
-        private static Converter excelConverter = new ExcelConverter();
-        private static Converter powerPointConverter = new PowerPointConverter();
+        private static Converter wordConverter = null;
+        private static Converter excelConverter = null;
+        private static Converter powerPointConverter = null;
 
         private static Converter GetByType(String type)
         {
@@ -15,15 +15,23 @@ namespace pdfsvc.Converters
             {
                 case "DOC":
                 case "DOCX":
-                    return wordConverter;
+                    return wordConverter != null ? wordConverter : (wordConverter = new WordConverter());
                 case "XLS":
                 case "XLSX":
-                    return excelConverter;
+                    return excelConverter != null ? excelConverter : (excelConverter = new ExcelConverter());
                 case "PPT":
                 case "PPTX":
-                    return powerPointConverter;
+                    return powerPointConverter != null ? powerPointConverter : (powerPointConverter = new PowerPointConverter());
                 default:
                     throw new ConvertException("不支持的文件格式！");
+            }
+        }
+
+        private static void DisposeConverter(Converter converter)
+        {
+            if (converter != null)
+            {
+                converter.Dispose();
             }
         }
 
@@ -36,6 +44,14 @@ namespace pdfsvc.Converters
             }
 
             return GetByType(type);
+        }
+
+        public static void DisposeConverters()
+        {
+            // 释放资源，关闭Office程序
+            DisposeConverter(wordConverter);
+            DisposeConverter(excelConverter);
+            DisposeConverter(powerPointConverter);
         }
     }
 }

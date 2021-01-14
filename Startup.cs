@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using pdfsvc.Business;
+using pdfsvc.Converters;
 
 namespace pdfsvc
 {
@@ -40,7 +41,7 @@ namespace pdfsvc
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime lifetime)
         {
             if (env.IsDevelopment())
             {
@@ -63,6 +64,9 @@ namespace pdfsvc
             {
                 endpoints.MapControllers();
             });
+
+            // 关闭程序，清理资源（析构函数无法保证执行）
+            lifetime.ApplicationStopping.Register(ConverterFactory.DisposeConverters);
         }
     }
 }

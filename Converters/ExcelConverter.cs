@@ -6,15 +6,12 @@ namespace pdfsvc.Converters
 {
     public class ExcelConverter : Converter
     {
-        private Excel.Application _app;
+        private Excel.Application _app = null;
 
         public ExcelConverter()
         {
-            if (_app == null)
-            {
-                _app = new Excel.Application();
-                _app.Visible = false;
-            }
+            _app = new Excel.Application();
+            _app.Visible = false;
         }
 
         public override void Convert(string inputFile, string outputFile)
@@ -57,10 +54,22 @@ namespace pdfsvc.Converters
 
         ~ExcelConverter()
         {
+            Dispose();
+        }
+
+        public override void Dispose()
+        {
+            if (_app == null)
+            {
+                // 已经释放，无需再释放
+                return;
+            }
+
             try
             {
                 _app.Quit();
                 ReleaseCOMObject(_app);
+                _app = null;
             }
             catch
             {

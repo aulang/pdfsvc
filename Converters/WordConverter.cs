@@ -6,7 +6,7 @@ namespace pdfsvc.Converters
 {
     public class WordConverter : Converter
     {
-        private Word.Application _app;
+        private Word.Application _app = null;
 
         public WordConverter()
         {
@@ -54,10 +54,22 @@ namespace pdfsvc.Converters
 
         ~WordConverter()
         {
+            Dispose();
+        }
+
+        public override void Dispose()
+        {
+            if (_app == null)
+            {
+                // 已经释放，无需再释放
+                return;
+            }
+
             try
             {
                 _app.Quit(false);
                 ReleaseCOMObject(_app);
+                _app = null;
             }
             catch
             {

@@ -8,7 +8,7 @@ namespace pdfsvc.Converters
         {
         }
 
-        public ConvertException(Exception exception) : base(exception.Message)
+        public ConvertException(Exception exception) : base(exception.Message, exception)
         {
         }
     }
