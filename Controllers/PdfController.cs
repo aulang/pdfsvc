@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using System;
 using System.Web;
 using System.IO;
@@ -31,10 +32,12 @@ namespace pdfsvc.Controllers
         /// </summary>
         /// <param name="file">PDF文件</param>
         /// <param name="sign">是否签名</param>
-        /// <param name="flag">签名标记</param>
+        /// <param name="regex">签名标记正则表达式</param>
+        /// <param name="pages">标记查找页码，负数倒数页码</param>
+        /// <param name="latest">是否在最后一个标记处签名</param>
         /// <returns>PDF文件</returns>
         [HttpPost("convert")]
-        public async Task<IActionResult> Convert(IFormFile file, bool sign = false, string flag = null)
+        public async Task<IActionResult> Convert(IFormFile file, bool sign = false, string regex = null, List<int> pages = null, bool latest = true)
         {
             // 文件名
             string fileName = Path.GetFileName(file.FileName);
@@ -60,6 +63,11 @@ namespace pdfsvc.Controllers
                 return Problem(e.StackTrace, e.Message, StatusCodes.Status500InternalServerError);
             }
 
+            if (sign)
+            {
+                // TODO PDF 签名盖章
+            }
+
             // 更改文件后缀
             fileName = Path.ChangeExtension(fileName, FileManager.PDF);
             // 文件名UTF-8编码
@@ -72,10 +80,12 @@ namespace pdfsvc.Controllers
         /// PDF文件签名盖章
         /// </summary>
         /// <param name="file">PDF文件</param>
-        /// <param name="flag">签名标记</param>
+        /// <param name="regex">签名标记正则表达式</param>
+        /// <param name="pages">标记查找页码，负数倒数页码</param>
+        /// <param name="latest">是否在最后一个标记处签名</param>
         /// <returns>PDF文件</returns>
         [HttpPost("sign")]
-        public IActionResult Sign(IFormFile file, string flag = null)
+        public IActionResult Sign(IFormFile file, string regex = null, List<int> pages = null, bool latest = true)
         {
             _logger.LogInformation("PDF文件签名盖章");
 

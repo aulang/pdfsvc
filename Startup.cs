@@ -24,7 +24,9 @@ namespace pdfsvc
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton(new FileManager("D:/pdfsvc/data"));
+            string outDir = Configuration["OutDir"];
+            services.AddSingleton(new FileManager(outDir));
+            services.Configure<SignInfo>(Configuration.GetSection(SignInfo.Key));
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
