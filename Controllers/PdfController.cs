@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -20,11 +21,13 @@ namespace pdfsvc.Controllers
     {
         private readonly ILogger<PdfController> _logger;
         private readonly FileManager _fileManager;
+        private readonly FdfManager _pdfManager;
 
-        public PdfController(ILogger<PdfController> logger, FileManager fileManager)
+        public PdfController(ILogger<PdfController> logger, FileManager fileManager, FdfManager pdfManager)
         {
             _logger = logger;
             _fileManager = fileManager;
+            _pdfManager = pdfManager;
         }
 
         /// <summary>
@@ -37,7 +40,11 @@ namespace pdfsvc.Controllers
         /// <param name="latest">是否在最后一个标记处签名</param>
         /// <returns>PDF文件</returns>
         [HttpPost("convert")]
-        public async Task<IActionResult> Convert(IFormFile file, bool sign = false, string regex = null, List<int> pages = null, bool latest = true)
+        public async Task<IActionResult> Convert([Required] IFormFile file,
+            [FromForm] bool sign = false,
+            [FromForm] string regex = null,
+            [FromForm] List<int> pages = null,
+            [FromForm] bool latest = true)
         {
             // 文件名
             string fileName = Path.GetFileName(file.FileName);
@@ -85,7 +92,10 @@ namespace pdfsvc.Controllers
         /// <param name="latest">是否在最后一个标记处签名</param>
         /// <returns>PDF文件</returns>
         [HttpPost("sign")]
-        public IActionResult Sign(IFormFile file, string regex = null, List<int> pages = null, bool latest = true)
+        public IActionResult Sign([Required] IFormFile file,
+            [FromForm] string regex = null,
+            [FromForm] List<int> pages = null,
+            [FromForm] bool latest = true)
         {
             _logger.LogInformation("PDF文件签名盖章");
 

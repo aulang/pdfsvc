@@ -26,7 +26,9 @@ namespace pdfsvc
         {
             string outDir = Configuration["OutDir"];
             services.AddSingleton(new FileManager(outDir));
+            
             services.Configure<SignInfo>(Configuration.GetSection(SignInfo.Key));
+            services.AddSingleton(typeof(FdfManager));
 
             services.AddControllers();
             services.AddSwaggerGen(c =>

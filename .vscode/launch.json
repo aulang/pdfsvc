@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/bin/Debug/net5.0/pdfsvc.dll",
+            "program": "${workspaceFolder}/bin/Debug/net5.0/win-x64/pdfsvc.dll",
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
             "env": {
