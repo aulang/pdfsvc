@@ -8,5 +8,6 @@ namespace pdfsvc.Business
         public string Cert { get; set; }
         public string Password { get; set; }
         public string Alias { get; set; }
+        public float Opacity { get; set; }
     }
 }
