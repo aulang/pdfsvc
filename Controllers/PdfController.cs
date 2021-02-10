@@ -9,6 +9,7 @@ using System.Web;
 using System.IO;
 using System.Text;
 using pdfsvc.Business;
+using pdfsvc.Core;
 
 namespace pdfsvc.Controllers
 {
@@ -35,8 +36,8 @@ namespace pdfsvc.Controllers
         /// </summary>
         /// <param name="file">PDF文件</param>
         /// <param name="sign">是否签名</param>
-        /// <param name="regex">签名标记正则表达式</param>
-        /// <param name="pages">标记查找页码，负数倒数页码</param>
+        /// <param name="regex">签名标记正则表达式，默认“盖章”</param>
+        /// <param name="pages">标记查找页码，负数倒数页码, 默认-1</param>
         /// <param name="latest">是否在最后一个标记处签名</param>
         /// <returns>PDF文件</returns>
         [HttpPost("convert")]
@@ -72,7 +73,14 @@ namespace pdfsvc.Controllers
 
             if (sign)
             {
-                // TODO PDF 签名盖章
+                // PDF签名盖章
+                using Stream pdf = new FileStream(outputFilePath, FileMode.Open);
+                outputFilePath = outputFilePath.Replace(".pdf", "_signed.pdf");
+                using Stream outPdf = new FileStream(outputFilePath, FileMode.Create);
+
+                StampInfo stampInfo = new StampInfo(regex, pages, latest);
+
+                _pdfManager.Sign(pdf, outPdf, stampInfo);
             }
 
             // 更改文件后缀
@@ -87,12 +95,12 @@ namespace pdfsvc.Controllers
         /// PDF文件签名盖章
         /// </summary>
         /// <param name="file">PDF文件</param>
-        /// <param name="regex">签名标记正则表达式</param>
-        /// <param name="pages">标记查找页码，负数倒数页码</param>
+        /// <param name="regex">签名标记正则表达式，默认“盖章”</param>
+        /// <param name="pages">标记查找页码，负数倒数页码, 默认-1</param>
         /// <param name="latest">是否在最后一个标记处签名</param>
         /// <returns>PDF文件</returns>
         [HttpPost("sign")]
-        public IActionResult Sign([Required] IFormFile file,
+        public async Task<IActionResult> Sign([Required] IFormFile file,
             [FromForm] string regex = null,
             [FromForm] List<int> pages = null,
             [FromForm] bool latest = true)
@@ -101,11 +109,30 @@ namespace pdfsvc.Controllers
 
             // 文件名
             string fileName = Path.GetFileName(file.FileName);
-            // TODO PDF签名
+            // 上传Office文件保持路径
+            string inputFilePath = _fileManager.GetInputPdfPath(fileName);
 
+            using (FileStream stream = new FileStream(inputFilePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            string outputFilePath = _fileManager.GetOutputFilePath(fileName);
+
+            // PDF签名盖章
+            using Stream pdf = new FileStream(inputFilePath, FileMode.Open);
+            using Stream outPdf = new FileStream(outputFilePath, FileMode.Create);
+
+            StampInfo stampInfo = new StampInfo(regex, pages, latest);
+
+            _pdfManager.Sign(pdf, outPdf, stampInfo);
+
+            // 更改文件后缀
+            fileName = Path.ChangeExtension(fileName, FileManager.PDF);
             // 文件名UTF-8编码
             fileName = HttpUtility.UrlEncode(fileName, Encoding.UTF8);
-            return Ok();
+
+            return PhysicalFile(outputFilePath, "application/pdf", fileName);
         }
     }
 }

@@ -57,7 +57,7 @@ namespace pdfsvc.Business
             return GetInputFilePath(fileName, PDF);
         }
 
-        private string GetOutputFilePath(string inputPath)
+        public string GetOutputFilePath(string inputPath)
         {
             StringBuilder builder = new StringBuilder(GetParentDirectory(inputPath));
             builder.Append(Path.DirectorySeparatorChar).Append(PDF);

@@ -32,9 +32,9 @@ namespace pdfsvc.Core
 
                 ICollection<IPdfTextLocation> collection = strategy.GetResultantLocations();
 
-                foreach (IPdfTextLocation e in collection)
+                foreach (IPdfTextLocation l in collection)
                 {
-                    ((DefaultPdfTextLocation)e).SetPageNr(page);
+                    ((DefaultPdfTextLocation)l).SetPageNr(page);
                 }
 
                 locations.AddRange(collection);

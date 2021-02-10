@@ -10,7 +10,7 @@ using System.IO;
 
 namespace pdfsvc.Business
 {
-    public class FdfManager
+    public class 
     {
         private readonly SignInfo _signInfo;
 

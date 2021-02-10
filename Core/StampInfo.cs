@@ -5,6 +5,35 @@ namespace pdfsvc.Core
 {
     public class StampInfo
     {
+        public StampInfo()
+        {
+
+        }
+
+        public StampInfo(string regex, List<int> pages, bool latest = true)
+        {
+            if (regex == null || regex == "")
+            {
+                Regex = "盖章";
+            }
+            else
+            {
+                Regex = regex;
+            }
+
+            if (pages == null || pages.Count == 0)
+            {
+                Pages = new List<int>();
+                pages.Add(-1);
+            }
+            else
+            {
+                Pages = pages;
+            }
+
+            Latest = latest;
+        }
+
         // 盖章日期，可为null
         public long SignDate { get; set; }
         // 盖章理由，可为null
