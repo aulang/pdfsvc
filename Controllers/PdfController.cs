@@ -74,9 +74,9 @@ namespace pdfsvc.Controllers
             if (sign)
             {
                 // PDF签名盖章
-                using Stream pdf = new FileStream(outputFilePath, FileMode.Open);
+                using FileStream pdf = new FileStream(outputFilePath, FileMode.Open);
                 outputFilePath = outputFilePath.Replace(".pdf", "_signed.pdf");
-                using Stream outPdf = new FileStream(outputFilePath, FileMode.Create);
+                using FileStream outPdf = new FileStream(outputFilePath, FileMode.Create);
 
                 StampInfo stampInfo = new StampInfo(regex, pages, latest);
 
@@ -86,7 +86,7 @@ namespace pdfsvc.Controllers
             // 更改文件后缀
             fileName = Path.ChangeExtension(fileName, FileManager.PDF);
             // 文件名UTF-8编码
-            fileName = HttpUtility.UrlEncode(fileName, Encoding.UTF8);
+            // fileName = HttpUtility.UrlEncode(fileName, Encoding.UTF8);
 
             return PhysicalFile(outputFilePath, "application/pdf", fileName);
         }
@@ -120,17 +120,15 @@ namespace pdfsvc.Controllers
             string outputFilePath = inputFilePath.Replace(".pdf", "_signed.pdf");
 
             // PDF签名盖章
-            using Stream pdf = new FileStream(inputFilePath, FileMode.Open);
-            using Stream outPdf = new FileStream(outputFilePath, FileMode.Create);
+            using FileStream pdf = new FileStream(inputFilePath, FileMode.Open);
+            using FileStream outPdf = new FileStream(outputFilePath, FileMode.Create);
 
             StampInfo stampInfo = new StampInfo(regex, pages, latest);
 
             _pdfManager.Sign(pdf, outPdf, stampInfo);
 
-            // 更改文件后缀
-            fileName = Path.ChangeExtension(fileName, FileManager.PDF);
             // 文件名UTF-8编码
-            fileName = HttpUtility.UrlEncode(fileName, Encoding.UTF8);
+            // fileName = HttpUtility.UrlEncode(fileName, Encoding.UTF8);
 
             return PhysicalFile(outputFilePath, "application/pdf", fileName);
         }
