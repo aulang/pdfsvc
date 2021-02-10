@@ -15,8 +15,8 @@ namespace pdfsvc.Business
         private readonly SignInfo _signInfo;
 
         private readonly ImageData _stamper;
-        private readonly ICipherParameters _pk;
         private readonly X509Certificate[] _chain;
+        private readonly ICipherParameters _privateKey;
 
         public FdfManager(IOptions<SignInfo> options)
         {
@@ -37,7 +37,7 @@ namespace pdfsvc.Business
                 _chain[i] = entries[i].Certificate;
             }
 
-            _pk = store.GetKey(_signInfo.Alias).Key;
+            _privateKey = store.GetKey(_signInfo.Alias).Key;
         }
 
         public int Sign(Stream pdf, Stream outPdf, StampInfo stampInfo)
@@ -48,10 +48,9 @@ namespace pdfsvc.Business
             ExPdfSigner signer = new ExPdfSigner(reader, outPdf, stampInfo, _stamper, properties)
                 .SetOpacity(_signInfo.Opacity);
 
-            PrivateKeySignature signature = new PrivateKeySignature(_pk, DigestAlgorithms.SHA256);
+            PrivateKeySignature signature = new PrivateKeySignature(_privateKey, DigestAlgorithms.SHA256);
 
-            return signer.Sign(
-                    signature,
+            return signer.Sign(signature,
                     _chain,
                     null,
                     null,

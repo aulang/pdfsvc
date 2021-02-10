@@ -50,7 +50,7 @@ namespace pdfsvc.Core
         {
             List<IPdfTextLocation> locations = RegexLocationUtils.ExtractLocation(document, _stampInfo);
 
-            if (locations.Count > 0)
+            if (locations.Count < 1)
             {
                 // log.warn("没有找到要求的盖章位置：{}", _stampInfo);
                 return 0;
@@ -95,7 +95,7 @@ namespace pdfsvc.Core
             appearance.SetPageRect(rectangle);
             InitAppearanceLayer2();
 
-            base.SignDetached(signature,
+            SignDetached(signature,
                     chain,
                     crlList,
                     ocspClient,

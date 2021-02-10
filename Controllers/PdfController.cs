@@ -117,7 +117,7 @@ namespace pdfsvc.Controllers
                 await file.CopyToAsync(stream);
             }
 
-            string outputFilePath = _fileManager.GetOutputFilePath(fileName);
+            string outputFilePath = inputFilePath.Replace(".pdf", "_signed.pdf");
 
             // PDF签名盖章
             using Stream pdf = new FileStream(inputFilePath, FileMode.Open);
